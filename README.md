@@ -4,7 +4,7 @@
 
 ------
 
-###使用LrcDecoder:
+### 使用LrcDecoder:
 
  ```c++
     #include "lrcdecoder.h"
@@ -15,7 +15,7 @@
         decoder.decode(string(argv[1]));
     }
  ```
-#####然后:
+##### 然后:
  ```sh
     .\lrcdecoder test.lrc
  ```
