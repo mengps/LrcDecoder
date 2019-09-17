@@ -128,6 +128,7 @@ bool LrcDecoder::seek(int64_t timestamp, LrcDecoder::SeekFlag flag)
         if (it->first > timestamp) {
             if (flag == SeekForward) d->m_readIndex = --it;
             else d->m_readIndex = it;
+            std::cout << it->first << it->second << std::endl;
             return true;
         }
     }
@@ -147,9 +148,9 @@ void LrcDecoder::dumpMetadata(FILE *out)
 
 void LrcDecoder::dumpLyrics(FILE *out)
 {
-    fprintf(out, "[===Lyrics===]\n", d->m_filename.c_str());
+    fprintf(out, "[===Lyrics===]\n");
     for (auto it: d->m_lyrics) {
-        fprintf(out, "[Pts: %d]---[Lyric: %s]\n", it.first, it.second.c_str());
+        fprintf(out, "[Pts: %lld]---[Lyric: %s]\n", it.first, it.second.c_str());
     }
     fflush(out);
 }
