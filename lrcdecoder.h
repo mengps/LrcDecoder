@@ -40,8 +40,8 @@ public:
     string get(const string &meta);
 
     /**
-     * @brief 获取一个lyricPacket
-     * @return lyricPacket
+     * @brief 获取一个LyricPacket
+     * @return LyricPacket
      */
     lyricPacket readPacket();
 
