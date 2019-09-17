@@ -13,6 +13,8 @@
     {
         LrcDecoder decoder;
         decoder.decode(string(argv[1]));
+        decoder.dumpMetadata(stdout);
+        decoder.dumpLyrics(stdout);
     }
  ```
 #### 然后:
