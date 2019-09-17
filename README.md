@@ -15,7 +15,7 @@
         decoder.decode(string(argv[1]));
     }
  ```
-##### 然后:
+#### 然后:
  ```sh
     .\lrcdecoder test.lrc
  ```
