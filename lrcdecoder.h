@@ -40,7 +40,7 @@ public:
     string get(const string &meta);
 
     /**
-     * @brief 获取一个LyricPacket
+     * @brief 读取一个LyricPacket
      * @return LyricPacket
      */
     lyricPacket readPacket();
@@ -61,7 +61,7 @@ public:
 
     /**
      * @brief 转储歌词
-     * @param out 对应的文件指针
+     * @param out 目标文件指针
      */
     void dumpLyrics(FILE *out);
 
