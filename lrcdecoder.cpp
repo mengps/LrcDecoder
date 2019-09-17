@@ -16,10 +16,10 @@ static const string MetaData[7][2] = {
     {"ve", "encoder_version"}
 };
 
-static string findData(const string &meta) {
+static string findMeta(const string &tag) {
     string data;
     for (int i = 0; i < 7; ++i) {
-        if (meta == MetaData[i][0]) {
+        if (tag == MetaData[i][0]) {
             data = MetaData[i][1];
             break;
         }
@@ -28,14 +28,16 @@ static string findData(const string &meta) {
     return data;
 }
 
-class LrcDecoderPrivate {
+class LrcDecoderPrivate
+{
 public:
-    size_t currentIndex = 0;
+    size_t m_currentIndex = 0;
     string m_filename;
     string m_lastError;
     string m_lrcData;
     std::map<string, string> m_metadata;
     std::map<int64_t, string> m_lyrics;
+    std::map<int64_t, string>::iterator m_readIndex;
 
     void cleanup();
 
@@ -54,7 +56,7 @@ LrcDecoder::~LrcDecoder()
     delete d;
 }
 
-bool LrcDecoder::decode(const std::string &lrcFile)
+bool LrcDecoder::decode(const string &lrcFile)
 {
     d->cleanup();
 
@@ -94,6 +96,8 @@ bool LrcDecoder::decode(const std::string &lrcFile)
         line = d->readLine();
     }
 
+    d->m_readIndex = d->m_lyrics.begin();
+
     return true;
 }
 
@@ -104,6 +108,31 @@ std::string LrcDecoder::get(const std::string &meta)
         data = d->m_metadata[meta];
 
     return data;
+}
+
+lyricPacket LrcDecoder::readPacket()
+{
+    lyricPacket packet;
+    if (d->m_readIndex != d->m_lyrics.end()) {
+        packet.pts = d->m_readIndex->first;
+        packet.lyric = d->m_readIndex->second;
+        d->m_readIndex++;
+    }
+
+    return packet;
+}
+
+bool LrcDecoder::seek(int64_t timestamp, LrcDecoder::SeekFlag flag)
+{
+    for (auto it = d->m_lyrics.begin(); it != d->m_lyrics.end(); it++) {
+        if (it->first > timestamp) {
+            if (flag == SeekForward) d->m_readIndex = --it;
+            else d->m_readIndex = it;
+            return true;
+        }
+    }
+
+    return false;
 }
 
 void LrcDecoder::dumpMetadata(FILE *out)
@@ -132,7 +161,7 @@ std::string LrcDecoder::lastError() const
 
 void LrcDecoderPrivate::cleanup()
 {
-    currentIndex = 0;
+    m_currentIndex = 0;
     m_filename.clear();
     m_lastError.clear();
     m_lrcData.clear();
@@ -160,7 +189,7 @@ size_t LrcDecoderPrivate::decodeHeader()
                 data += m_lrcData.at(offset);
             }
 
-            m_metadata[findData(meta)] = data;
+            m_metadata[findMeta(meta)] = data;
         }
 
         offset++;
@@ -221,13 +250,13 @@ string LrcDecoderPrivate::readLine()
 {
     size_t length = m_lrcData.length();
     string line;
-    while (currentIndex < length) {
-        if (m_lrcData.at(currentIndex) == '\n') {
-            currentIndex++;
+    while (m_currentIndex < length) {
+        if (m_lrcData.at(m_currentIndex) == '\n') {
+            m_currentIndex++;
             break;
         } else {
-            line += m_lrcData.at(currentIndex);
-            currentIndex++;
+            line += m_lrcData.at(m_currentIndex);
+            m_currentIndex++;
         }
     }
 

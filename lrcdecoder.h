@@ -4,17 +4,24 @@
 #include <string>
 using std::string;
 
-struct lyricsPacket {
+typedef struct lyricPacket {
     /** @brief 歌词*/
-    string lyrics;
+    string lyric;
     /** @brief 显示时间戳 单位: ms*/
-    int64_t pts;
-};
+    int64_t pts = 0;
+
+    bool isEmpty() const { return lyric.empty() && pts == 0; }
+} lyricPacket;
 
 class LrcDecoderPrivate;
 class LrcDecoder
 {
 public:
+    enum SeekFlag {
+        SeekForward = 1,
+        SeekBackward
+    };
+
     LrcDecoder();
     ~LrcDecoder();
 
@@ -31,6 +38,20 @@ public:
      * @return 成功返回对应数据
      */
     string get(const string &meta);
+
+    /**
+     * @brief 获取一个lyricPacket
+     * @return lyricPacket
+     */
+    lyricPacket readPacket();
+
+    /**
+     * @brief 利用给定的时间戳来寻求一个最接近的位置
+     * @param timestamp 时间戳,单位ms
+     * @param flag 查找标志
+     * @return 成功返回true,否则返回false
+     */
+    bool seek(int64_t timestamp, SeekFlag flag = SeekForward);
 
     /**
      * @brief 转储元数据
