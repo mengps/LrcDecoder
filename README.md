@@ -17,12 +17,13 @@
         decoder.dumpLyrics(stdout);
     }
  ```
-#### 然后:
+### 然后:
  ```sh
     .\lrcdecoder test.lrc
  ```
 ------
 
-  开发环境windows 10
+### 开发环境
+    Windows 10, C++11
 
 ------
