@@ -4,14 +4,14 @@
 #include <string>
 using std::string;
 
-typedef struct lyricPacket {
+typedef struct LyricPacket {
     /** @brief 歌词*/
     string lyric;
     /** @brief 显示时间戳 单位: ms*/
     int64_t pts = 0;
 
     bool isEmpty() const { return lyric.empty() && pts == 0; }
-} lyricPacket;
+} LyricPacket;
 
 class LrcDecoderPrivate;
 class LrcDecoder
@@ -43,7 +43,7 @@ public:
      * @brief 读取一个LyricPacket
      * @return LyricPacket
      */
-    lyricPacket readPacket();
+    LyricPacket readPacket();
 
     /**
      * @brief 利用给定的时间戳来寻求一个最接近的位置

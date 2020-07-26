@@ -110,9 +110,9 @@ std::string LrcDecoder::get(const std::string &meta)
     return data;
 }
 
-lyricPacket LrcDecoder::readPacket()
+LyricPacket LrcDecoder::readPacket()
 {
-    lyricPacket packet;
+    LyricPacket packet;
     if (d->m_readIndex != d->m_lyrics.end()) {
         packet.pts = d->m_readIndex->first;
         packet.lyric = d->m_readIndex->second;
