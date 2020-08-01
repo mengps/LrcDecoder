@@ -31,6 +31,7 @@ static string findMeta(const string &tag) {
 class LrcDecoderPrivate
 {
 public:
+    int64_t m_duration = 0;
     size_t m_currentIndex = 0;
     string m_filename;
     string m_lastError;
@@ -96,6 +97,7 @@ bool LrcDecoder::decode(const string &lrcFile)
         line = d->readLine();
     }
 
+    d->m_duration = (--d->m_lyrics.end())->first;
     d->m_readIndex = d->m_lyrics.begin();
 
     return true;
@@ -124,16 +126,29 @@ LyricPacket LrcDecoder::readPacket()
 
 bool LrcDecoder::seek(int64_t timestamp, LrcDecoder::SeekFlag flag)
 {
-    for (auto it = d->m_lyrics.begin(); it != d->m_lyrics.end(); it++) {
-        if (it->first > timestamp) {
-            if (flag == SeekForward) d->m_readIndex = --it;
-            else d->m_readIndex = it;
-            std::cout << it->first << it->second << std::endl;
-            return true;
+    if (flag == SeekFlag::SeekForward) {
+        auto end = --d->m_lyrics.end();
+        for (d->m_readIndex = d->m_lyrics.begin()
+             ; d->m_readIndex != end; d->m_readIndex++) {
+            if (d->m_readIndex->first >= timestamp) {
+                return true;
+            }
+        }
+    } else {
+        for (d->m_readIndex = --d->m_lyrics.end()
+             ; d->m_readIndex != d->m_lyrics.begin(); d->m_readIndex--) {
+            if (d->m_readIndex->first <= timestamp) {
+                return true;
+            }
         }
     }
 
     return false;
+}
+
+int64_t LrcDecoder::duration() const
+{
+    return d->m_duration;
 }
 
 void LrcDecoder::dumpMetadata(FILE *out)
